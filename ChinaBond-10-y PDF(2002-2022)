@@ -1,0 +1,25 @@
+import pandas as pd
+import numpy as np
+from WindPy import *
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+w.start()
+startdate3y, enddate = '2002-1-1', '2022-8-15'
+bond = w.edb("S0059744,S0059747,S0059749,S0059752,G0000887,G0000891", startdate3y, enddate,"Fill=Previous",usedf = True)[1]
+bond.index = pd.DatetimeIndex(bond.index)
+bond.columns = ['中债国债到期收益率：1年','中债国债到期收益率：5年','中债国债到期收益率：10年','中债国债到期收益率：30年','美国国债到期收益率：2年','美国国债到期收益率：10年']
+cbond10 = bond['中债国债到期收益率：10年'].dropna()
+
+mu = cbond10.mean()  # mean of distribution
+sigma = cbond10.std()  # standard deviation of distribution
+x = cbond10
+num_bins = 50
+
+fig, ax = plt.subplots()
+# the histogram of the data
+n, bins, patches = ax.hist(x, num_bins, density=True)
+
+y = ((1 / (np.sqrt(2 * np.pi) * sigma)) *
+     np.exp(-0.5 * (1 / sigma * (bins - mu))**2))
+ax.plot(bins, y, '--')
